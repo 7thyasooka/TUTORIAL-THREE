@@ -1,0 +1,128 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script src="https://unpkg.com/three@0.147.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://unpkg.com/three@0.147.0/examples/js/loaders/GLTFLoader.js"></script>
+
+    <script>
+      // ページの読み込みを待つ
+      window.addEventListener('DOMContentLoaded', init);
+
+      // 非同期処理で待機するのでasync function宣言とする
+      async function init() {
+        // サイズを指定
+        const width = 960;
+        const height = 540;
+
+        // レンダラーを作成
+        const canvasElement = document.querySelector('#myCanvas');
+        const renderer = new THREE.WebGLRenderer({
+          canvas: canvasElement,
+        });
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(width, height);
+
+        // シーンを作成
+        const scene = new THREE.Scene();
+
+        // カメラを作成
+        const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 10000);
+        // カメラの初期座標を設定
+        camera.position.set(0.5, 40, 40);
+
+        // カメラコントローラーを作成
+        const controls = new THREE.OrbitControls(camera, canvasElement);
+        controls.target.set(0, 0, 0);
+        controls.update();
+
+        // 平行光源を作成
+        // 上から照らす
+        const directionalLight = new THREE.DirectionalLight(0xffffff);
+        directionalLight.position.set(1, 1, 1);
+        scene.add(directionalLight);
+
+        // 横からテラス
+        const directionalLight2 = new THREE.DirectionalLight(0xffffff);
+        directionalLight2.position.set(1, 0, 1);
+        scene.add(directionalLight2);
+
+        // GLTF形式のモデルデータを読み込む
+        const loader = new THREE.GLTFLoader();
+        // GLTFファイルのパスを指定
+        const gltf = await loader.loadAsync('./models/gltf/fire.gltf/korean_fire_extinguisher_01_4k.gltf');
+        // 読み込み後に3D空間に追加
+        const model = gltf.scene;
+
+        let blueMaterial, redMaterial, yellowMaterial;
+// model.traverse( function ( child ) {
+//   if ( child.isMesh ) {
+//     // childのマテリアルを取得する
+//     const childMaterial = child.material;
+//     if (childMaterial.name === "Material_Blue") {
+//       // 青色のマテリアルを作成
+//       blueMaterial = new THREE.MeshBasicMaterial( { color: 0x0000ff } );
+//       child.material = blueMaterial;
+//     } else if (childMaterial.name === "Material_Red") {
+//       // 赤色のマテリアルを作成
+//       redMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+//       child.material = redMateriala;
+//     } else if (childMaterial.name === "Material_Yellow") {
+      // 黄色のマテリアルを作成
+    //   yellowMaterial = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+    //   child.material = yellowMaterial;
+
+//       / 各パーツに異なるマテリアルを設定する
+// parts.part1.material = blueMaterial;
+// parts.part2.material = redMaterial;
+// モデルのパーツを探す
+const parts = {};
+model.traverse((child) => {
+    if (child instanceof THREE.Mesh) {
+    child.material.color.set(0x0000ff);
+    console.log(child)
+
+    const geometry = child.geometry;
+const positionAttribute = geometry.attributes.position;
+const colorAttribute = geometry.attributes.color;
+
+// フェイスインデックスを指定して、変更したい頂点のインデックスを取得する
+const faceIndex = 0;
+const vertexIndices = [];
+geometry.index.array.slice(faceIndex * 3, faceIndex * 3 + 3).forEach(index => {
+  vertexIndices.push(index);
+});
+
+// 頂点カラーを変更する
+const color = new THREE.Color(0xff0000);
+vertexIndices.forEach(index => {
+  colorAttribute.setXYZ(index, color.r, color.g, color.b);
+});
+
+// バッファのアップデート
+colorAttribute.needsUpdate = true;
+
+}
+
+});
+
+scene.add(model);
+
+
+        model.scale.set(30, 30, 30);
+
+        tick();
+
+        // 毎フレーム時に実行されるループイベントです
+        function tick() {
+          // レンダリング
+          renderer.render(scene, camera);
+          requestAnimationFrame(tick);
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <canvas id="myCanvas"></canvas>
+  </body>
+</html>
