@@ -15,11 +15,11 @@
 # Usage
 **プロジェクトダウンロードする(ローカル環境で動作するので環境構築不要)**
 ```bash
-git clone git@github.com:Seventh-Pitch-com/TaskApp.git
+git clone git@github.com:7thyasooka/TUTORIAL-THREE.git
 ```
 **指定ファイルをブラウザで起動**
 ```bash
-test.1html
+test1.html
 ```
 # Note
 ```bash
